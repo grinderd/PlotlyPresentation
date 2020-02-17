@@ -1,0 +1,209 @@
+---
+title: "Plot.ly: How I learned a (very little) java script and love interactive plots:"
+author: "David Grinder"
+output: html_notebook
+---
+
+```{r, echo= FALSE}
+#Import libraries
+
+library(plotly)
+library(listviewer)
+library(tidyverse)
+library(lubridate)
+```
+
+```{r, echo = FALSE}
+#Importing data
+pros_df = read_csv("prosper2019.csv")
+
+```
+
+```{r}
+
+pros_agg = pros_df%>%
+  mutate(yr = year(origination_date),mn = month(origination_date))%>%
+  #group_by(yr,mn, prosper_rating)%>%
+  group_by(origination_date,prosper_rating,yr,mn)%>%
+  summarize(avg_amt_borrowed = mean(amount_borrowed),
+            w_avg_rate = weighted.mean(borrower_rate,amount_borrowed))%>%
+  mutate(org_dt = ymd(paste(yr,mn,'01',sep = '-')))
+  
+pros_agg2 = pros_df%>%
+  mutate(yr = year(origination_date),mn = month(origination_date))%>%
+  group_by(yr,mn, prosper_rating)%>%
+  #group_by(origination_date,prosper_rating,yr,mn)%>%
+  summarize(avg_amt_borrowed = mean(amount_borrowed),
+            w_avg_rate = weighted.mean(borrower_rate,amount_borrowed))%>%
+  mutate(org_dt = ymd(paste(yr,mn,'01',sep = '-')))
+
+
+```
+
+
+
+# A little about me before we begin:
+
+
+Modeler at Bank of America
+
+Avid Star Wars Fan
+
+![](return_of_jedi.jpg)
+
+Amatuer user and ardent supporter of version control in data science
+
+![](git.png)
+
+R user for the last 9 years.
+
+Used R for modeling and development at American Credit Acceptance before coming to Bank of America.
+
+![](ACA.png)
+
+- Introduced and championed Shiny for rapid application development
+- Developed various models and process improvements using R tool kit
+
+**Bank of America work:**
+
+![](https://www.underconsideration.com/brandnew/archives/bank_of_america_logo_animation_new_a.gif)
+
+- Modeling Lead for Consumer Behavior Modeling:
+- Worked on Risk Models for a year
+- Currently working on Innovation team (Best job I think I will ever have):
+  - New modeling ideas
+  - New areas of the business that would benefit from modeling knowledge
+  - Application of deep learning
+
+# **What is this presenation?**
+
+# **I enjoy the data visualization side of data science**
+
+## **ggplot was always go too for my data science needs**
+
+- simple intuitive syntax to write and read
+- wide range of useful geoms to solve common modeling problems
+- integrates well with the rest of tidyverse
+
+- (Big step forward from lattice and base graphics)
+
+
+
+### **ggplot is an adoption of the precepts laid out in the Grammar of Graphics** 
+
+![](GG_concepts.png)
+
+## ggplot doesn't lend itself to interactivity
+
+- several efforts have introduced interactivity 
+  - ggvis
+  - rggobi
+  - iPlots
+  - htmlwidgets
+  - r2d3
+
+# htmlwidets and r2d3 are an adaptation of D3/javascript technology
+
+## D3 is a javascript package that is very important in data visualization
+
+- Written in a language that integrates with web development
+- Uses data to manipulate the web document through various objects (SVG)
+- Released in 2011
+
+### Useful examples of power and interactivity:
+
+# Sunburst Example
+
+![](https://i.stack.imgur.com/H6O2K.gif)
+
+# Density over time
+
+![](https://media.giphy.com/media/NTjiuskIME6awKn1nD/giphy.gif)
+
+[Decision Tree Example](http://bl.ocks.org/fractalytics/raw/495b63cf671b4c487bc40801366384e0/)
+
+
+# **D3 Pros and Cons**
+
+*Pros*
+- Very flexible and portable
+- Interactivity part of the dna
+- Looks very professional and polished
+
+*Cons*
+- Very steep learning curve
+  - API requires decent understanding of how javascript
+- Centered on webdevelopment instead of data science
+- ?Falling out of favor?
+
+## What is the answer?
+
+# **Plot.ly is a solution with a simpler API and out of the box interactivity**
+
+Essentially plot.ly is API wrapper for several D3
+
+
+# **How does the plotly package work**
+
+Key to understading package is understanding how it transforms the data
+
+- Data enters in R formats
+- Transformed to list format 
+- Tranformed to JSON format
+
+Below is a useful diagram showing how the final presentation is done.
+
+![](plotly_data_transform.svg)
+
+**Plotly uses two key components:**
+
+1. Data/Trace:
+  - Connection between data and visuals
+  - Traces have types (scatter plot, histograms, sunburst, etc.)
+  - Trace types have specific atttributes that can be defined.
+2. Layout
+
+
+# **ggplotly() to the rescue**
+
+If you have plots in ggplot, you can start using plotly with just a simple function call on most ggplot objects.
+
+
+Let's make a ggplot from Propser data.  
+```{r}
+amt_fin_p = pros_agg%>%
+  ggplot(aes(origination_date,avg_amt_borrowed))+
+  geom_line(aes(color = prosper_rating))
+
+amt_fin_p
+```
+
+Simple ggplotly command adds the tooltip, zooming, 
+
+```{r}
+ggplotly(amt_fin_p)
+```
+
+Now the plotly syntax:
+
+```{r}
+pros_agg%>%
+  plot_ly(x = ~origination_date, y = ~avg_amt_borrowed, color = ~prosper_rating, type = 'scatter', mode = 'lines')
+#  add_lines(color = ~prosper_rating)
+```
+
+
+
+
+```{r}
+plot(cars)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+```{r}
+
+```
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.

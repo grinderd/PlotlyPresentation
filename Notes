@@ -1,0 +1,26 @@
+Notes on Presenation:
+
+Explain basics of what is going on:
+
+plotly.js data transfer.
+What a trace is and how things are treated differently.
+
+ggplotly (basically all the interactivity for free)
+
+
+working with plotly.js directly through 
+
+scatter
+
+line plot
+
+2d density with histograms
+
+sunburst - titanic
+
+aluvian/sankee - 
+"https://cdn.rawgit.com/christophergandrud/networkD3/master/JSONdata/energy.json"
+
+candlestick
+
+ 
