@@ -20,3 +20,5 @@ p <- plot_ly(midwest, x= ~percollege, color = ~state, type = "box")
 p <- plot_ly(midwest, x= ~percollege, color = percamerindian~state, type = "box")
 
 p
+
+

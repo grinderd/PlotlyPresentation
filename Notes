@@ -10,17 +10,25 @@ ggplotly (basically all the interactivity for free)
 
 working with plotly.js directly through 
 
+Prosper Loan plot
+
 scatter
 
-line plot
+line plot X
 
 2d density with histograms
 
-sunburst - titanic
+sunburst - titanic (datasets)
 
 aluvian/sankee - 
 "https://cdn.rawgit.com/christophergandrud/networkD3/master/JSONdata/energy.json"
 
-candlestick
+https://www.r-graph-gallery.com/sankey-diagram
 
- 
+candlestick
+'''
+library(plotly)
+library(quantmod)
+
+getSymbols("AAPL",src='yahoo')
+'''
