@@ -16,7 +16,7 @@ library(lubridate)
 ```{r, echo = FALSE}
 #Importing data
 pros_df = read_csv("prosper2019.csv")
-
+pros_df_sam = pros_df[sample(nrow(pros_df),10000),]
 ```
 
 ```{r}
@@ -171,6 +171,31 @@ If you have plots in ggplot, you can start using plotly with just a simple funct
 
 Let's make a ggplot from Propser data.  
 ```{r}
+pros_scat = pros_df_sam%>%
+  ggplot(aes(principal_paid, interest_paid))+geom_point(aes(color = factor(prosper_rating)))
+
+pros_scat
+```
+
+
+
+```{r}
+ggplotly(pros_scat)
+
+```
+
+```{r}
+
+
+pros_df_sam%>%
+  plot_ly(x = ~principal_paid, y = ~interest_paid)%>%
+  add_markers(color = ~prosper_rating)
+```
+
+
+
+Do it again, but with lines:
+```{r}
 amt_fin_p = pros_agg%>%
   ggplot(aes(origination_date,avg_amt_borrowed))+
   geom_line(aes(color = prosper_rating))
@@ -188,22 +213,116 @@ Now the plotly syntax:
 
 ```{r}
 pros_agg%>%
+  ungroup()%>%
   plot_ly(x = ~origination_date, y = ~avg_amt_borrowed, color = ~prosper_rating, type = 'scatter', mode = 'lines')
 #  add_lines(color = ~prosper_rating)
 ```
+Same Graph different syntax (using the add_* trace addition)
+```{r}
+pros_agg%>%
+  ungroup()%>%
+  plot_ly(x = ~origination_date, y = ~avg_amt_borrowed)%>%
+  add_lines(color = ~prosper_rating)
+```
+
+Histogram:
+```{r}
+pros_df_sam%>%
+  plot_ly(x = ~borrower_rate)%>%
+  add_histogram()
+```
+
+Histogram with muiltple factors
+```{r}
+
+pros_df_sam%>%
+  plot_ly(x = ~factor(term), color = ~prosper_rating)%>%
+  add_histogram()
+
+```
+
+Now lets do this with 2 dimentions
+
+```{r}
+
+pros_df%>%
+  plot_ly(
+    x = ~principal_paid,
+    y = ~interest_paid,
+    type = 'histogram2dcontour'
+  )
+  
+  
+  
+```
+
+```{r}
+
+subplt = subplot(
+  
+  pros_df_sam%>%plot_ly(x = ~principal_paid, color = I("black"),type = 'histogram'),
+  plotly_empty(),
+  pros_df_sam%>%plot_ly(x = ~principal_paid,y = ~interest_paid,type = 'histogram2dcontour'),
+  pros_df_sam%>%plot_ly(y = ~interest_paid,color = I("black"),type = 'histogram'),
+  nrows = 2,  
+  heights = c(0.2,0.8), 
+  widths = c(0.8,0.2),
+  shareX = TRUE,
+  shareY = TRUE
+)
+
+p = layout(subplt, showlegend = FALSE)
+  
+p
+  
+```
 
 
 
 
 ```{r}
-plot(cars)
+x <- rnorm(1000)
+y <- rnorm(1000)
+s <- subplot(
+  plot_ly(x = x, color = I("black"), type = 'histogram'), 
+  plotly_empty(), 
+  plot_ly(x = x, y = y, type = 'histogram2dcontour', showscale = F), 
+  plot_ly(y = y, color = I("black"), type = 'histogram'),
+  nrows = 2, heights = c(0.2, 0.8), widths = c(0.8, 0.2), 
+  shareX = TRUE, shareY = TRUE, titleX = FALSE, titleY = FALSE
+)
+
+p <- layout(s, showlegend = FALSE)
+
+p
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+What does that look like in ggplot?  Doable but not intuitive.
 ```{r}
+library(gridExtra)
 
+hist_top <- pros_df_sam%>%ggplot(aes(principal_paid))+geom_histogram()
+empty <- ggplot()+geom_point(aes(1,1), colour="white")+
+         theme(axis.ticks=element_blank(), 
+               panel.background=element_blank(), 
+               axis.text.x=element_blank(), axis.text.y=element_blank(),           
+               axis.title.x=element_blank(), axis.title.y=element_blank())
+
+scatter <- ggplot()+geom_density_2d(aes(pros_df_sam$principal_balance, pros_df_sam$interest_paid))
+
+hist_right <- pros_df_sam%>%ggplot(aes(interest_paid))+geom_histogram()+coord_flip()
+
+grid.arrange(hist_top, empty, scatter, hist_right, ncol=2, nrow=2, widths=c(4, 1), heights=c(1, 4))
 ```
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+Ack.  Not as good.  
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+Now some plots that are very difficult to do in ggplot and rely on the interactivity heavily.
+
+Sunburst
+
+```{r}
+```
+
