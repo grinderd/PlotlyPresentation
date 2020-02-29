@@ -1,5 +1,5 @@
 '''
-Purpose: Develop some notes about
+Purpose: Develop some notes about plotly implementation
 
 
 
